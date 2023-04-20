@@ -271,7 +271,6 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} yum -y install MariaDB-server MariaDB-client MariaDB-columnstore-cmapi MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} apt install --yes MariaDB-server MariaDB-client  MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} systemctl start mariadb',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER} systemctl unmask mariadb-columnstore',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} systemctl start mariadb-columnstore',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} touch before-upgrade.log',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} mariadb -e "create database if not exists test; create table test.t1 (a int) engine=Columnstore; insert into test.t1 values (1); select * from test.t1" > "before_upgrade.log"',
