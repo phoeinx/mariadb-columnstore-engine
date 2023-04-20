@@ -262,7 +262,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       'docker run --volume /sys/fs/cgroup:/sys/fs/cgroup:ro --env DEBIAN_FRONTEND=noninteractive --env MCS_USE_S3_STORAGE=0 --name upgrade$${DRONE_BUILD_NUMBER} --ulimit core=-1 --privileged --detach ' + img + ' ' + init + ' --unit=basic.target',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} bash -c "yum install -y wget procps-ng"',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} sed -i "s/exit 101/exit 0/g" /usr/sbin/policy-rc.d',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} bash -c "apt update --yes && apt install -y procps wget"',
+      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} bash -c "apt update --yes && apt install -y procps wget curl"',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} chmod +x mariadb_es_repo_setup',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} bash -c "./mariadb_es_repo_setup --token=$${UPGRADE_TOKEN} --apply --mariadb-server-version=10.6.4-1 --skip-maxscale --skip-tools"',
