@@ -270,7 +270,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./mariadb_es_repo_setup --token=$${UPGRADE_TOKEN} --apply --mariadb-server-version=' + version + ' --skip-maxscale --skip-tools"',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y update',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt update --yes',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y install MariaDB-server MariaDB-client MariaDB-columnstore-cmapi MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
+      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y install MariaDB-server MariaDB-client  MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt install --yes MariaDB-server MariaDB-client  MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb-columnstore',
