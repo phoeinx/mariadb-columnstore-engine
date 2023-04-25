@@ -185,6 +185,8 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
     'test001.sh',
   ],
 
+  local mdb_server_versions = ['10.6.4-1', '10.6.5-2', '10.6.7-3', '10.6.8-4', '10.6.9-5', '10.6.11-6', '10.6.12-7'],
+
   local indexes(arr) = std.range(0, std.length(arr) - 1),
 
   regression(name, depends_on):: {
@@ -248,8 +250,8 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       'docker exec -t smoke$${DRONE_BUILD_NUMBER} mariadb -e "insert into test.t1 values (2); select * from test.t1"',
     ],
   },
-  upgrade:: {
-    name: 'upgrade-test',
+  upgrade(version):: {
+    name: 'upgrade-test from ' + version,
     depends_on: ['pkg'],
     image: 'docker',
     volumes: [pipeline._volumes.docker],
@@ -265,7 +267,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} bash -c "apt update --yes && apt install -y procps wget curl"',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER} chmod +x mariadb_es_repo_setup',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER} bash -c "./mariadb_es_repo_setup --token=$${UPGRADE_TOKEN} --apply --mariadb-server-version=10.6.4-1 --skip-maxscale --skip-tools"',
+      'docker exec -t upgrade$${DRONE_BUILD_NUMBER} bash -c "./mariadb_es_repo_setup --token=$${UPGRADE_TOKEN} --apply --mariadb-server-version=' + version + ' --skip-maxscale --skip-tools"',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} yum -y update',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} apt update --yes',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER} yum -y install MariaDB-server MariaDB-client MariaDB-columnstore-cmapi MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
@@ -699,7 +701,7 @@ EOF"',
          [pipeline.smoke] +
          [pipeline.smokelog] +
          [pipeline.publish('smokelog')] +
-         [pipeline.upgrade] +
+         [pipeline.upgrade(mdb_server_versions[i]) for i in indexes(mdb_server_versions)] +
          (if (platform == 'rockylinux:8' && arch == 'amd64') then [pipeline.dockerfile] + [pipeline.dockerhub] + [pipeline.multi_node_mtr] else [pipeline.mtr] + [pipeline.publish('mtr')] + [pipeline.mtrlog] + [pipeline.publish('mtrlog')]) +
          (if (event == 'cron' && platform == 'rockylinux:8' && arch == 'amd64') then [pipeline.publish('mtr latest', 'latest')] else []) +
          [pipeline.prepare_regression] +
