@@ -302,7 +302,7 @@ EOF"',
   },
   upgradelog:: {
     name: 'upgradelog',
-    depends_on: [mdb_server_versions[std.length(mdb_server_versions) - 1]],
+    depends_on: ['upgrade-test from ' + mdb_server_versions[std.length(mdb_server_versions) - 1]],
     image: 'docker',
     volumes: [pipeline._volumes.docker],
     commands: [
