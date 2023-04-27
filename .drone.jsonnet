@@ -252,7 +252,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
   },
   upgrade(version):: {
     name: 'upgrade-test from ' + version,
-    depends_on: ['pkg'],
+    depends_on: ['smoke'],
     image: 'docker',
     volumes: [pipeline._volumes.docker],
     environment: {
@@ -261,6 +261,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       },
     },
     commands: [
+      'mkdir -p upgrade-logs',
       'docker run --volume /sys/fs/cgroup:/sys/fs/cgroup:ro --env DEBIAN_FRONTEND=noninteractive --env MCS_USE_S3_STORAGE=0 --name upgrade$${DRONE_BUILD_NUMBER}' + version + ' --ulimit core=-1 --privileged --detach ' + img + ' ' + init + ' --unit=basic.target',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "yum install -y wget procps-ng curl"',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' sed -i "s/exit 101/exit 0/g" /usr/sbin/policy-rc.d',
@@ -274,7 +275,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt install --yes mariadb-server mariadb-client mariadb-plugin-columnstore',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb-columnstore',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' mariadb -e "create database if not exists test; create table test.t1 (a int) engine=Columnstore; insert into test.t1 values (1); select * from test.t1" > "before_upgrade.log"',
+      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' mariadb -e "create database if not exists test; create table test.t1 (a int) engine=Columnstore; insert into test.t1 values (1); select * from test.t1" > "upgrade-logs/before_' + version + 'upgrade.log"',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t --workdir /etc/yum.repos.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch repo.repo',
       if (pkg_format == 'deb') then 'docker exec -t --workdir /etc/apt upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch auth.conf',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t --workdir /etc/yum.repos.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "cat <<EOF > repo.repo
@@ -293,12 +294,24 @@ EOF"',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt install -y ca-certificates',
       if (pkg_format == 'deb') then 'docker exec -t --workdir /etc/apt/sources.list.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' echo "deb [trusted=yes] https://cspkg.s3.amazonaws.com/develop/cron/7476/10.6-enterprise/amd64/' + platform + '/" > repo.list',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt update --yes',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch after-upgrade.log',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' mariadb -e "select * from test.t1" > "after-upgrade.log"',
-      'echo "a\n1" > reference.log',
-      'diff reference.log before_upgrade.log',
-      'diff reference.log after_upgrade.log',
+      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' mariadb -e "select * from test.t1" > "upgrade-logs/after_' + version + 'upgrade.log"',
+      'echo "a\n1" > upgrade-logs/reference'+ version +'.log',
+      'diff upgrade-logs/reference' + version + '.log upgrade-logs/before_' + version + 'upgrade.log',
+      'diff upgrade-logs/reference' + version + '.log upgrade-logs/after_' + version + 'upgrade.log',
     ],
+  },
+  upgradelog:: {
+    name: 'upgradelog',
+    depends_on: [mdb_server_versions[std.length(mdb_server_versions) - 1]],
+    image: 'docker',
+    volumes: [pipeline._volumes.docker],
+    commands: [
+      'echo',
+      'cp -r upgrade-logs /drone/src/' + result + '/',
+    ] + std.map(function(ver) 'docker stop upgrade$${DRONE_BUILD_NUMBER}' + ver + ' && docker rm upgrade$${DRONE_BUILD_NUMBER}' + ver + ' || echo "cleanup upgrade from version ' + ver + ' failure"', mdb_server_versions),
+    when: {
+      status: ['success', 'failure'],
+    },
   },
   mtr:: {
     name: 'mtr',
@@ -704,6 +717,7 @@ EOF"',
          [pipeline.smokelog] +
          [pipeline.publish('smokelog')] +
          [pipeline.upgrade(mdb_server_versions[i]) for i in indexes(mdb_server_versions)] +
+         [pipeline.upgradelog] +
          (if (platform == 'rockylinux:8' && arch == 'amd64') then [pipeline.dockerfile] + [pipeline.dockerhub] + [pipeline.multi_node_mtr] else [pipeline.mtr] + [pipeline.publish('mtr')] + [pipeline.mtrlog] + [pipeline.publish('mtrlog')]) +
          (if (event == 'cron' && platform == 'rockylinux:8' && arch == 'amd64') then [pipeline.publish('mtr latest', 'latest')] else []) +
          [pipeline.prepare_regression] +
