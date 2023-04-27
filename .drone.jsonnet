@@ -307,7 +307,7 @@ EOF"',
     volumes: [pipeline._volumes.docker],
     commands: [
       'echo',
-      'cp -r upgrade-logs /drone/src/' + result + '/',
+      'cp -r upgrade-logs /drone/src/' + result + '/ || echo "missing upgrade logs"',
     ] + std.map(function(ver) 'docker stop upgrade$${DRONE_BUILD_NUMBER}' + ver + ' && docker rm upgrade$${DRONE_BUILD_NUMBER}' + ver + ' || echo "cleanup upgrade from version ' + ver + ' failure"', mdb_server_versions),
     when: {
       status: ['success', 'failure'],
