@@ -274,6 +274,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y install MariaDB-server MariaDB-client  MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt install --yes mariadb-server mariadb-client mariadb-plugin-columnstore',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb',
+      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl list-units',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb-columnstore',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' mariadb -e "create database if not exists test; create table test.t1 (a int) engine=Columnstore; insert into test.t1 values (1); select * from test.t1" > "upgrade-logs/before_' + version + 'upgrade.log"',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t --workdir /etc/yum.repos.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch repo.repo',
