@@ -284,11 +284,11 @@ name = repo
 baseurl = https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/' + result + '/
 enabled = 1
 gpgcheck = 0
+module_hotfixes=1
 EOF"',
       if (pkg_format == 'deb') then 'docker exec -t --workdir /etc/apt upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "cat << EOF > auth.conf
 machine https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/' + result + '/
 EOF"',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' dnf module -y disable mysql mariadb',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y update',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt update --yes',
       if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt install -y ca-certificates',
