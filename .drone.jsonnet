@@ -277,7 +277,7 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb-columnstore',
       'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./upgrade_data.sh"',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./upgrade_veryfy.sh"',
+      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./upgrade_verify.sh"',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t --workdir /etc/yum.repos.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch repo.repo',
       if (pkg_format == 'deb') then 'docker exec -t --workdir /etc/apt upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch auth.conf',
       if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t --workdir /etc/yum.repos.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "cat <<EOF > repo.repo
