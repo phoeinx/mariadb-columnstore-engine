@@ -11,7 +11,7 @@ NAME3='flights'
 test_data ()
 {
     NAME=$1
-    mariadb --init-command="SET sql_mode=''" -vvv -e "select * into outfile '${NAME}.test.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n' FROM columnstore_bts.${NAME};"
+    mariadb --init-command="SET sql_mode=''" -vvv -e "select * into outfile '/${NAME}.test.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n' FROM columnstore_bts.${NAME};"
     diff "${NAME}.test.csv" "${NAME}.csv"
 }
 
