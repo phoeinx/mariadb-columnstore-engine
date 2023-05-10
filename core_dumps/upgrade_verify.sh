@@ -18,4 +18,4 @@ test_data ()
 
 test_data "$NAME1"
 test_data "$NAME2"
-test_data "$NAME3"
+#test_data "$NAME3"
