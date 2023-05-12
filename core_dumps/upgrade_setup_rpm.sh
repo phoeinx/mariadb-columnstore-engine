@@ -2,9 +2,9 @@
 
 set -xeuo pipefail
 
-VERSION=$1
-RESULT=$2
-UPGRADE_TOKEN=$3
+VERSION="$1"
+RESULT="$2"
+UPGRADE_TOKEN="$3"
 
 bash -c "yum install -y wget which procps-ng"
 wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup
