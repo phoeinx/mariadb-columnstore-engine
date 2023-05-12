@@ -261,43 +261,10 @@ local Pipeline(branch, platform, event, arch='amd64', server='10.6-enterprise') 
       },
     },
     commands: [
-      'mkdir -p upgrade-logs',
-      'mkdir -p tmp',
       'docker run --volume /sys/fs/cgroup:/sys/fs/cgroup:ro --env DEBIAN_FRONTEND=noninteractive --env MCS_USE_S3_STORAGE=0 --name upgrade$${DRONE_BUILD_NUMBER}' + version + ' --ulimit core=-1 --privileged --detach ' + img + ' ' + init + ' --unit=basic.target',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "yum install -y wget which procps-ng"',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' sed -i "s/exit 101/exit 0/g" /usr/sbin/policy-rc.d',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "apt update --yes && apt install -y procps wget curl"',
       'docker cp core_dumps/. upgrade$${DRONE_BUILD_NUMBER}' + version + ':/',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' chmod +x mariadb_es_repo_setup',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./mariadb_es_repo_setup --token=$${UPGRADE_TOKEN} --apply --mariadb-server-version=' + version + ' --skip-maxscale --skip-tools"',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y update',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt update --yes',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y install MariaDB-server MariaDB-client  MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt install --yes mariadb-server mariadb-client mariadb-plugin-columnstore',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' systemctl start mariadb-columnstore',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./upgrade_data.sh"',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./upgrade_verify.sh"',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t --workdir /etc/yum.repos.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch repo.repo',
-      if (pkg_format == 'deb') then 'docker exec -t --workdir /etc/apt upgrade$${DRONE_BUILD_NUMBER}' + version + ' touch auth.conf',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t --workdir /etc/yum.repos.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "cat <<EOF > repo.repo
-[repo]
-name = repo
-baseurl = https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/' + result + '/
-enabled = 1
-gpgcheck = 0
-module_hotfixes=1
-EOF"',
-      if (pkg_format == 'deb') then 'docker exec -t --workdir /etc/apt upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "cat << EOF > auth.conf
-machine https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/' + result + '/
-EOF"',
-      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' yum -y update',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt update --yes',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt install -y ca-certificates',
-      if (pkg_format == 'deb') then 'docker exec -t --workdir /etc/apt/sources.list.d upgrade$${DRONE_BUILD_NUMBER}' + version + ' echo "deb [trusted=yes] https://cspkg.s3.amazonaws.com/develop/cron/7476/10.6-enterprise/amd64/' + platform + '/" > repo.list',
-      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' apt update --yes',
-      'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c "./upgrade_verify.sh"',
+      if (pkg_format == 'deb') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c ./upgrade_setup_deb.sh '+ version + ' ' + result + ' $${UPGRADE_TOKEN}',
+      if (std.split(platform, ':')[0] == 'centos' || std.split(platform, ':')[0] == 'rockylinux') then 'docker exec -t upgrade$${DRONE_BUILD_NUMBER}' + version + ' bash -c ./upgrade_setup_rpm.sh '+ version + ' ' + result + ' $${UPGRADE_TOKEN}',
     ],
   },
   upgradelog:: {
