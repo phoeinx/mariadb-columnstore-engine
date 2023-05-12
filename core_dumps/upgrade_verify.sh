@@ -13,6 +13,7 @@ test_data ()
     NAME=$1
     mariadb --init-command="SET sql_mode=''" -vvv -e "select * into outfile '/tmp/${NAME}.test.csv' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' FROM columnstore_bts.${NAME};"
     diff <(tail -n +2 "${NAME}.csv") <(tail -n +2  "/tmp/${NAME}.test.csv")
+    rm "/tmp/${NAME}.test.csv"
 }
 
 
