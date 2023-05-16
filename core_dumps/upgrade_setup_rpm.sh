@@ -6,7 +6,8 @@ VERSION="$1"
 RESULT="$2"
 UPGRADE_TOKEN="$3"
 
-bash -c "yum install -y wget which procps-ng"
+yum install -y wget which procps-ng
+rpm -qa | grep -qw curl || yum install -y curl
 wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup
 chmod +x mariadb_es_repo_setup
 bash -c "./mariadb_es_repo_setup --token=${UPGRADE_TOKEN} --apply --mariadb-server-version=${VERSION} --skip-maxscale --skip-tools"
