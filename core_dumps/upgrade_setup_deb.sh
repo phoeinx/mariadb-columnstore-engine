@@ -19,9 +19,9 @@ bash -c "./upgrade_data.sh"
 bash -c "./upgrade_verify.sh"
 
 touch /etc/apt/auth.conf
-bash -c "cat << EOF > /etc/apt/auth.conf
+cat << EOF > /etc/apt/auth.conf
 machine https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/${RESULT}/
-EOF"
+EOF
 
 apt update --yes
 apt install -y ca-certificates
