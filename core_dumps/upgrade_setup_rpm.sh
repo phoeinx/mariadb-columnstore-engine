@@ -19,14 +19,14 @@ bash -c "./upgrade_data.sh"
 bash -c "./upgrade_verify.sh"
 
 touch /etc/yum.repos.d/repo.repo
-bash -c "cat <<EOF > /etc/yum.repos.d/repo.repo
+cat <<EOF > /etc/yum.repos.d/repo.repo
 [repo]
 name = repo
 baseurl = https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/${RESULT}/
 enabled = 1
 gpgcheck = 0
 module_hotfixes=1
-EOF"
+EOF
 
 yum -y update
 bash -c "./upgrade_verify.sh"
