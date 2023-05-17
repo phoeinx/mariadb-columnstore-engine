@@ -27,6 +27,6 @@ apt update --yes
 apt install -y ca-certificates
 cd /etc/apt/sources.list.d
 echo "deb [trusted=yes] https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/ ${RESULT}/" > repo.list
-
+cd /
 apt update --yes
 bash -c "./upgrade_verify.sh"
