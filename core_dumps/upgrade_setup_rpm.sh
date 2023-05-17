@@ -4,7 +4,8 @@ set -xeuo pipefail
 
 VERSION="$1"
 RESULT="$2"
-UPGRADE_TOKEN="$3"
+ARCH="$3"
+UPGRADE_TOKEN="$4"
 
 yum install -y wget which procps-ng
 wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup
@@ -22,7 +23,7 @@ touch /etc/yum.repos.d/repo.repo
 cat <<EOF > /etc/yum.repos.d/repo.repo
 [repo]
 name = repo
-baseurl = https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/amd64/${RESULT}/
+baseurl = https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/${ARCH}/${RESULT}/
 enabled = 1
 gpgcheck = 0
 module_hotfixes=1
