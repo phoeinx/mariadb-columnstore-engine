@@ -31,4 +31,5 @@ echo "deb [trusted=yes] https://cspkg.s3.amazonaws.com/develop/latest/10.6-enter
 
 cd /
 apt update --yes
+apt upgrade --yes
 bash -c "./upgrade_verify.sh"

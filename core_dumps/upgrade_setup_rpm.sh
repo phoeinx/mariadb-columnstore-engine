@@ -29,5 +29,5 @@ gpgcheck = 0
 module_hotfixes=1
 EOF
 
-yum -y update
+yum check-update
 bash -c "./upgrade_verify.sh"
