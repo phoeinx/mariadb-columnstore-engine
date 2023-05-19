@@ -7,20 +7,20 @@ RESULT="$2"
 ARCH="$3"
 UPGRADE_TOKEN="$4"
 
-yum install -y wget which procps-ng
+dnf install -y wget which procps-ng
 wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup
 chmod +x mariadb_es_repo_setup
 bash -c "./mariadb_es_repo_setup --token=${UPGRADE_TOKEN} --apply --mariadb-server-version=${VERSION} --skip-maxscale --skip-tools"
-yum -y update
-yum -y install MariaDB-server MariaDB-client  MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo
+dnf repo-pkgs mariadb-es-main list
+dnf -y install MariaDB-server MariaDB-client MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo
 
 systemctl start mariadb
 systemctl start mariadb-columnstore
 bash -c "./upgrade_data.sh"
 bash -c "./upgrade_verify.sh"
 
-touch /etc/yum.repos.d/repo.repo
-cat <<EOF > /etc/yum.repos.d/repo.repo
+touch /etc/dnf.repos.d/repo.repo
+cat <<EOF > /etc/dnf.repos.d/repo.repo
 [repo]
 name = repo
 baseurl = https://cspkg.s3.amazonaws.com/develop/latest/10.6-enterprise/${ARCH}/${RESULT}/
@@ -29,5 +29,6 @@ gpgcheck = 0
 module_hotfixes=1
 EOF
 
-yum check-update
+dnf repo-pkgs repo list
+dnf -y update MariaDB-server MariaDB-client MariaDB-columnstore-engine MariaDB-columnstore-engine-debuginfo
 bash -c "./upgrade_verify.sh"
