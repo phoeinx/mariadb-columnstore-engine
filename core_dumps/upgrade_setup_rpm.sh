@@ -23,7 +23,7 @@ touch /etc/yum.repos.d/repo.repo
 cat <<EOF > /etc/yum.repos.d/repo.repo
 [repo]
 name = repo
-baseurl = https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/${ARCH}/${RESULT}/
+baseurl = https://cspkg.s3.amazonaws.com/develop/latest/10.6-enterprise/${ARCH}/${RESULT}/
 enabled = 1
 gpgcheck = 0
 module_hotfixes=1

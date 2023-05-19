@@ -21,13 +21,14 @@ bash -c "./upgrade_verify.sh"
 
 touch /etc/apt/auth.conf
 cat << EOF > /etc/apt/auth.conf
-machine https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/${ARCH}/${RESULT}/
+machine https://cspkg.s3.amazonaws.com/develop/latest/10.6-enterprise/${ARCH}/${RESULT}/
 EOF
 
 apt update --yes
 apt install -y ca-certificates
 cd /etc/apt/sources.list.d
-echo "deb [trusted=yes] https://cspkg.s3.amazonaws.com/develop/cron/7689/10.6-enterprise/${ARCH}/ ${RESULT}/" > repo.list
+echo "deb [trusted=yes] https://cspkg.s3.amazonaws.com/develop/latest/10.6-enterprise/${ARCH}/ ${RESULT}/" > repo.list
+
 cd /
 apt update --yes
 bash -c "./upgrade_verify.sh"
