@@ -20,7 +20,7 @@ systemctl start mariadb-columnstore
 bash -c "./upgrade_data.sh"
 bash -c "./upgrade_verify.sh"
 
-cd /etc/dnf.repos.d/
+cd /etc/yum.repos.d/
 touch repo.repo
 cat <<EOF > repo.repo
 [repo]
