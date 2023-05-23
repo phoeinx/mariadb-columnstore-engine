@@ -7,7 +7,7 @@ RESULT="$2"
 ARCH="$3"
 UPGRADE_TOKEN="$4"
 
-dnf install -y wget which procps-ng
+yum install -y wget which procps-ng
 yum install -y diffutils
 wget https://dlm.mariadb.com/enterprise-release-helpers/mariadb_es_repo_setup -O mariadb_es_repo_setup
 chmod +x mariadb_es_repo_setup
