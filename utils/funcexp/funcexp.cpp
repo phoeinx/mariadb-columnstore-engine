@@ -381,6 +381,8 @@ void FuncExp::evaluate(rowgroup::Row& row, std::vector<execplan::SRCP>& expressi
 
         if (isNull)
           row.setIntField<8>(BIGINTNULL, expression[i]->outputIndex());
+        else if (static_cast<uint64_t>(val) == BIGINTNULL)
+          row.setIntField<8>(BIGINTNULL - 1, expression[i]->outputIndex());
         else
           row.setIntField<8>(val, expression[i]->outputIndex());
 
