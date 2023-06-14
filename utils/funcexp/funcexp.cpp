@@ -382,8 +382,8 @@ void FuncExp::evaluate(rowgroup::Row& row, std::vector<execplan::SRCP>& expressi
         if (isNull)
           row.setIntField<8>(BIGINTNULL, expression[i]->outputIndex());
         else if (static_cast<uint64_t>(val) == BIGINTNULL)
-          // @bug4632, as the lowest int64_t value is used as the BIGINTNULL marker
-          // output next possible value as a workaround
+          // @Bug 4632. As the lowest int64_t value is used as the BIGINTNULL marker
+          // output next possible value as a workaround.
           row.setIntField<8>(BIGINTNULL + 1, expression[i]->outputIndex());
         else
           row.setIntField<8>(val, expression[i]->outputIndex());
