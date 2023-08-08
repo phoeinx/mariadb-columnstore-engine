@@ -1935,7 +1935,7 @@ void makeJobSteps(CalpontSelectExecutionPlan* csep, JobInfo& jobInfo, JobStepVec
     jobInfo.tableList.push_back(tableUid);
   }
 
-  // add select suqueries
+  // add select subqueries
   preprocessSelectSubquery(csep, jobInfo);
 
   // semi-join may appear in having clause
