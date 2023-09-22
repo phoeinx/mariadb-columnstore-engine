@@ -5611,7 +5611,7 @@ void TupleAggregateStep::doAggregate_singleThread()
       // TODO: Find out why hasGenerations() hack is needed to access right RowAggregation instance for
       // finalAggregation?
       // fAggregator->finalAggregation();
-      while (fAggregator->nextRowGroup())
+      while (fAggregator->nextOutputRowGroup())
       {
         fAggregator->finalize();
         fRowsReturned += fRowGroupOut.getRowCount();
