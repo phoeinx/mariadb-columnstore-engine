@@ -337,6 +337,7 @@ TupleAggregateStep::TupleAggregateStep(const SP_ROWAGG_UM_t& agg, const RowGroup
   // decide if this needs to be multi-threaded
   RowAggregationDistinct* multiAgg = dynamic_cast<RowAggregationDistinct*>(fAggregator.get());
   fIsMultiThread = (multiAgg || fAggregator->aggMapKeyLength() > 0);
+  fIsMultiThread = false;
 
   // initialize multi-thread variables
   fNumOfThreads = fRm->aggNumThreads();
