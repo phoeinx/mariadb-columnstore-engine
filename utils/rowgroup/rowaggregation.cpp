@@ -4067,6 +4067,10 @@ void RowAggregationUM::setInputOutput(const RowGroup& pRowGroupIn, RowGroup* pRo
 //------------------------------------------------------------------------------
 bool RowAggregationUM::nextRowGroup()
 {
+  if (fRowAggStorage->hasGenerations())
+  {
+    finalAggregation();
+  }
   fCurRGData = fRowAggStorage->getNextRGData();
   bool more = static_cast<bool>(fCurRGData);
 

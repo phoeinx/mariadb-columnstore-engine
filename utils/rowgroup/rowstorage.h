@@ -65,6 +65,7 @@ class RowAggStorage
   }
 
   static size_t getBucketSize();
+  bool hasGenerations();
 
   /** @brief Find or create resulting row.
    *
@@ -341,7 +342,7 @@ class RowAggStorage
 
   std::unique_ptr<MemManager> fMM;
   uint32_t fNumOfInputRGPerThread;
-  bool fAggregated = true;
+  bool fAggregated = true;  // TODO: rename to more fitting name
   bool fAllowGenerations;
   bool fEnabledDiskAggregation;
   std::unique_ptr<compress::CompressInterface> fCompressor;

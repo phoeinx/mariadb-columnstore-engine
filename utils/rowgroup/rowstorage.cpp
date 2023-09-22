@@ -666,8 +666,8 @@ class RowGroupStorage
     }
   }
 
-  /** @brief Returns next RGData, load it from disk if necessary.
-   *
+  /** @brief Returns next RGData of the current generation, load it from disk if necessary.
+   * Attention: This method only works to return all RGDatas from the current generation.
    * @returns pointer to the next RGData or empty pointer if there is nothing
    */
   std::unique_ptr<RGData> getNextRGData()
@@ -1952,6 +1952,11 @@ void RowAggStorage::reserve(size_t c)
   {
     rehashPowerOfTwo(newSize);
   }
+}
+
+bool RowAggStorage::hasGenerations()
+{
+  return fGeneration >= 1;
 }
 
 void RowAggStorage::startNewGeneration()

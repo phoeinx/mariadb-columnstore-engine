@@ -5607,6 +5607,10 @@ void TupleAggregateStep::doAggregate_singleThread()
         dynamic_cast<RowAggregationDistinct*>(fAggregator.get())->doDistinctAggregation();
       }
 
+      // needed for disk-based aggregation
+      // TODO: Find out why hasGenerations() hack is needed to access right RowAggregation instance for
+      // finalAggregation?
+      // fAggregator->finalAggregation();
       while (fAggregator->nextRowGroup())
       {
         fAggregator->finalize();
