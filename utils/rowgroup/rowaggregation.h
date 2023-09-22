@@ -658,7 +658,7 @@ class RowAggregationUM : public RowAggregation
    */
   void endOfInput() override;
 
-  /** @brief Finializes the result set before sending back to the front end.
+  /** @brief Finalizes the result set before sending back to the front end.
    */
   void finalize();
 
