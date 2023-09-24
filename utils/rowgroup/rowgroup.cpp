@@ -1533,6 +1533,9 @@ void RowGroup::setDBRoot(uint32_t dbroot)
 
 RGData RowGroup::duplicate()
 {
+  // if we use the data Size hack the whole thing explodes because of empty data somewhere
+  // auto dataSize = getDataSize();
+  // how does this call destroy the internal data of RowGroup duplicate?
   RGData ret(*this, getRowCount());
 
   if (useStringTable)
@@ -1562,6 +1565,9 @@ RGData RowGroup::duplicate()
   }
   else
   {
+    // TODO: something still goes wrong here?
+    auto dataSize = getDataSize();
+    std::cout << dataSize << std::endl;
     memcpy(ret.rowData.get(), data, getDataSize());
   }
 

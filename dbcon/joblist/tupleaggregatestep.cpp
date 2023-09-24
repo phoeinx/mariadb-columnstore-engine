@@ -5591,7 +5591,7 @@ void TupleAggregateStep::doAggregate_singleThread()
 {
   AnyDataListSPtr dl = fOutputJobStepAssociation.outAt(0);
   RowGroupDL* dlp = dl->rowGroupDL();
-  RGData rgData;
+  RGData* rgData;
 
   try
   {
@@ -5615,13 +5615,14 @@ void TupleAggregateStep::doAggregate_singleThread()
       {
         fAggregator->finalize();
         fRowsReturned += fRowGroupOut.getRowCount();
-        rgData = fRowGroupOut.duplicate();
-        fRowGroupDelivered.setData(&rgData);
+        rgData = fRowGroupOut.getRGData();
+        fRowGroupDelivered.setData(rgData);
+        // TODO: Why did we use to duplicate?
 
         if (fRowGroupOut.getColumnCount() > fRowGroupDelivered.getColumnCount())
           pruneAuxColumns();
 
-        dlp->insert(rgData);
+        dlp->insert(*rgData);
       }
     }
   }  // try
